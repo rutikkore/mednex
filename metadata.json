@@ -1,0 +1,8 @@
+{
+  "name": "MedNexus",
+  "description": "Metropolitan Medical Grid: Unified Hospital Queue, Bed, and Blood Management System.",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone"
+  ]
+}
