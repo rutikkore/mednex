@@ -2,6 +2,10 @@
   "name": "mednexus",
   "private": true,
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rutikkore/mednex.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
