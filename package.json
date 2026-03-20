@@ -1,30 +1,18 @@
 {
   "name": "mednexus",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Mednexus Project Root",
+  "author": "rutikkore",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rutikkore/mednex.git"
   },
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.2.4",
-    "react-router-dom": "^7.13.0",
-    "react-dom": "^19.2.4",
-    "recharts": "^3.7.0",
-    "leaflet": "^1.9.4",
-    "react-leaflet": "^5.0.0",
-    "@google/genai": "^1.41.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "install:all": "npm install --prefix frontend",
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "preview": "npm run preview --prefix frontend",
+    "test:db": "node backend/verify-db.js"
   }
 }
