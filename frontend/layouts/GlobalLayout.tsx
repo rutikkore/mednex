@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useSync } from '../hooks/useSync';
+import { NotificationDropdown } from '../src/components/NotificationDropdown';
+import { useHospital } from '../hooks/useHospital';
+import { HospitalSelector } from '../src/components/HospitalSelector';
 
 interface NavItem {
   label: string;
@@ -14,6 +17,7 @@ interface NavItem {
 const GlobalLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const { lastEvent } = useSync();
+  const { hospitalId } = useHospital();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -88,6 +92,7 @@ const GlobalLayout: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col bg-[#020617] text-white`}>
+      {user && user.role !== 'patient' && !hospitalId && <HospitalSelector />}
       <header
         className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 border-b ${scrolled
           ? `bg-[#020617]/80 backdrop-blur-3xl border-white/10 py-4 shadow-xl`
@@ -122,6 +127,7 @@ const GlobalLayout: React.FC = () => {
           <div className="hidden lg:flex items-center gap-6 xl:gap-10 shrink-0">
             {user ? (
               <div className="flex items-center gap-4 xl:gap-8">
+                <NotificationDropdown />
                 <div className="text-right">
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white">{user.name}</p>
                   <p className="text-[9px] text-blue-500 font-bold uppercase tracking-widest mt-1 opacity-60">Node: {user.role}</p>

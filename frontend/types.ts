@@ -20,6 +20,7 @@ export interface Hospital {
     general: { total: number; available: number };
     cardiac: { total: number; available: number };
   };
+  last_updated_at?: string;
 }
 
 export interface BloodBankData {
@@ -28,6 +29,7 @@ export interface BloodBankData {
   location: [number, number];
   city: string;
   stock: Record<string, number>; // e.g., "A+": 10
+  last_updated_at?: string;
 }
 
 export interface Token {

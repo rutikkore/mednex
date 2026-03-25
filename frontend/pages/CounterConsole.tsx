@@ -8,6 +8,7 @@ const CounterConsole: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
   const [newPatient, setNewPatient] = useState<{
     name: string;
     service: string;
@@ -66,6 +67,38 @@ const CounterConsole: React.FC = () => {
     return tokens.find(t => t.status === 'called') || null;
   }, [tokens]);
 
+  useEffect(() => {
+    if (nowServing && audioEnabled) {
+      const synth = window.speechSynthesis;
+      if (synth) {
+          synth.cancel();
+          const spokenText = `Token, ${nowServing.number.replace('-', ' ')}, please proceed.`;
+          const utterance = new SpeechSynthesisUtterance(spokenText);
+          
+          try {
+              const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+              const oscillator = audioCtx.createOscillator();
+              const gainNode = audioCtx.createGain();
+              
+              oscillator.connect(gainNode);
+              gainNode.connect(audioCtx.destination);
+              
+              oscillator.type = 'sine';
+              oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+              gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+              
+              oscillator.start();
+              setTimeout(() => {
+                  oscillator.stop();
+                  synth.speak(utterance);
+              }, 400);
+          } catch(e) {
+              synth.speak(utterance);
+          }
+      }
+    }
+  }, [nowServing?.id, audioEnabled]);
+
   const waitingList = useMemo(() => {
     return tokens.filter(t => t.status === 'waiting');
   }, [tokens]);
@@ -109,9 +142,16 @@ const CounterConsole: React.FC = () => {
             <span className="text-[10px] uppercase font-black tracking-[0.4em] text-slate-500">Node Cluster Sync Active</span>
           </div>
         </div>
-        <div className="flex items-center gap-10">
-          <button onClick={() => setIsModalOpen(true)} className="px-10 py-5 bg-white text-black rounded-full font-black text-xs uppercase tracking-[0.3em] transition-all hover:bg-blue-600 hover:text-white shadow-2xl active:scale-95">Manual Registration</button>
-          <div className="text-right hidden sm:block">
+        <div className="flex items-center gap-6 sm:gap-10">
+          <button 
+             onClick={() => setAudioEnabled(!audioEnabled)} 
+             className={`p-5 rounded-full border transition-all flex items-center justify-center ${audioEnabled ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500' : 'bg-white/5 border-white/10 text-slate-500 hover:text-white'}`}
+             title="Toggle Audio Announcements"
+          >
+             <span className="material-icons-round text-xl">{audioEnabled ? 'volume_up' : 'volume_off'}</span>
+          </button>
+          <button onClick={() => setIsModalOpen(true)} className="px-8 sm:px-10 py-5 bg-white text-black rounded-full font-black text-xs uppercase tracking-[0.3em] transition-all hover:bg-blue-600 hover:text-white shadow-2xl active:scale-95">Manual Entry</button>
+          <div className="text-right hidden md:block">
             <p className="text-7xl font-black tracking-tighter text-white font-mono leading-none">{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
             <p className="text-blue-500 font-black uppercase tracking-[0.2em] text-[9px] mt-2">Temporal Node: METRO-01</p>
           </div>

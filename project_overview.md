@@ -7,10 +7,12 @@ To reduce emergency response times and optimize hospital resource allocation by 
 
 ## 🛠️ Technology Stack
 - **Frontend**: React (Vite), TypeScript, TailwindCSS
-- **Backend & Database**: Supabase (PostgreSQL, Authentication, Real-time Prescriptions)
+- **Backend & Database**: Supabase (PostgreSQL, Authentication, Real-time RPCs, Staleness & Notification triggers)
+- **Data Visualization**: Recharts (Dynamic Bar, Area, and Pie charts for MetroOps)
 - **Maps & Routing**: Leaflet (via `react-leaflet`)
 - **State Management**: React Context API (`useAuth`, `useHospital`)
 - **Routing**: React Router (`react-router-dom`)
+- **UI/UX & Design**: Premium, modern glassmorphic interface with Vercel-like aesthetics, smooth stagger animations, hover effects, and full dark-mode support for accessible data visualization.
 
 ## 🔑 Key Roles & Features
 
@@ -26,16 +28,19 @@ Operational dashboard for hospital staff to manage on-ground resources.
 - **Bed Management**: Update real-time availability of ICU, General, and Cardiac beds.
 - **Counter Console**: Manage patient queues, call next tokens, and mark visits as completed.
 - **Blood Bank Control**: Update blood stock levels (A+, B-, O+, etc.) instantly.
+- **Global Notification System**: Receive real-time alerts for low blood inventory, critical bed capacity, queue anomalies, and incoming transfer requests.
 
-### 3. Administrator Interface
-Strategic overview for hospital administrators.
-- **Analytics**: View system-wide metrics.
-- **User Management**: Manage staff accounts and permissions.
+### 3. Administrator Interface (METROOPS Command Suite)
+Strategic control center for hospital administrators and metropolitan grid controllers.
+- **Metropolitan Bed Matrix**: Real-time bar charts visualizing ICU, General, and Cardiac bed availability across all nodes.
+- **Grid Load Evolution**: Telemetry area charts tracking system throughput and active triage loads.
+- **Metropolitan Blood Inventory**: Live pie-chart breakdown of global blood stock, tracking critical scarcities.
+- **Grid Audit Generation**: Instantly export live system snapshots, logs, and telemetry matrix data as JSON.
 
-### 4. Authentication & Security
-- **Supabase Auth**: Secure email/password login and registration.
-- **Role-Based Access Control (RBAC)**: Protected routes ensure patients cannot access staff controls and vice versa.
-- **Profiles Table**: Links authentication data to application-specific user roles (`patient`, `receptionist`, `admin`, `doctor`).
+### 4. Core System Infrastructure
+- **Data Reliability & Freshness Tracking**: Automated staleness metrics (`step1_staleness.sql`, `FreshnessBadge`) ensure real-time data integrity and prevent UI decay.
+- **Inter-Hospital Transfers**: A specialized module for requesting and fulfilling blood transfers between hospital nodes (`step5_blood_transfers.sql`).
+- **Role-Based Access Control (RBAC)**: Supabase-driven security separating patients, staff, and admins.
 
 ## 📊 Database Schema (Supabase)
 
@@ -47,6 +52,7 @@ Stores facility locations and live resource counts.
 - `icu_total`, `icu_available`: Critical care capacity
 - `general_total`, `general_available`: Standard ward capacity
 - `cardiac_total`, `cardiac_available`: Specialized cardiac care capacity
+- `last_updated`: Tracks staleness for the Data freshness checker
 
 ### `blood_banks`
 Tracks blood inventory.
@@ -66,6 +72,22 @@ Extends Supabase Auth with custom user data.
 - `id`: References `auth.users`
 - `role`: `patient` | `receptionist` | `admin` | `doctor`
 - `full_name`, `avatar_url`: Display info
+
+### `notifications`
+Powers the Global Notification System.
+- `id`: UUID
+- `hospital_id`: References `hospitals.id`
+- `type`: `blood_low` | `bed_critical` | `queue_alert` | `transfer_request`
+- `message`: Notification body
+- `is_read`: Boolean status
+
+### `blood_transfer_requests`
+Facilitates hospital-to-hospital inter-bank transfers.
+- `id`: UUID
+- `from_hospital_id` / `to_hospital_id`: References `hospitals.id`
+- `blood_group`: The required stock group
+- `quantity`: Amount requested
+- `status`: `pending` | `approved` | `completed` | `rejected`
 
 ## 🔄 Emergency Logic (The "Brain")
 The **EmergencyRedirect** module (`frontend/pages/EmergencyRedirect.tsx`) is the system's most crucial feature. It:

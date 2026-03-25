@@ -23,6 +23,7 @@ const StaffDashboard: React.FC = () => {
   const [isEmergency, setIsEmergency] = useState(false);
   const [showRoomSelector, setShowRoomSelector] = useState(false);
   const [currentRoom, setCurrentRoom] = useState('Room 304 (General)');
+  const [showHandover, setShowHandover] = useState(false);
 
   /* ======================
      Fetch Tokens
@@ -165,6 +166,41 @@ const StaffDashboard: React.FC = () => {
     }
   };
 
+  const markNoShow = async () => {
+    if (!activeToken || processing) return;
+    setProcessing(true);
+    try {
+      const { error } = await supabase
+        .from('tokens')
+        .update({ status: 'no_show' })
+        .eq('id', activeToken.id);
+      if (error) throw error;
+      await fetchTokens();
+    } catch (err) {
+        console.error('Error marking no show:', err);
+    } finally {
+        setProcessing(false);
+    }
+  };
+
+  const priorityOverride = async (id: string) => {
+    if (processing) return;
+    setProcessing(true);
+    try {
+        // Sort to top by replacing created_at with an ancient anchor date
+        const { error } = await supabase
+            .from('tokens')
+            .update({ created_at: new Date(0).toISOString(), severity: 'emergency' })
+            .eq('id', id);
+        if (error) throw error;
+        await fetchTokens();
+    } catch (err) {
+        console.error('Error prioritizing:', err);
+    } finally {
+        setProcessing(false);
+    }
+  };
+
   const callTokenManual = async (id: string) => {
     if (processing) return;
     setProcessing(true);
@@ -296,27 +332,32 @@ const StaffDashboard: React.FC = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <button
                 onClick={completeToken}
                 disabled={!activeToken || processing || isEmergency}
-                className="group relative h-24 glass-premium rounded-3xl overflow-hidden disabled:opacity-30 transition-all border border-emerald-500/20 hover:border-emerald-500/50"
+                className="group relative h-20 glass-premium rounded-3xl overflow-hidden disabled:opacity-30 transition-all border border-emerald-500/20 hover:border-emerald-500/50 flex items-center justify-center gap-3 bg-emerald-500/5 hover:bg-emerald-500/10"
               >
-                <div className="flex items-center justify-center gap-4">
-                  <span className="text-xl font-black text-emerald-500 uppercase tracking-widest group-hover:scale-105 transition-transform">Finalize Session</span>
-                  <span className="material-icons-round text-3xl text-emerald-500 group-hover:rotate-12 transition-transform">task_alt</span>
-                </div>
+                  <span className="text-sm font-black text-emerald-500 uppercase tracking-widest group-hover:scale-105 transition-transform">Complete</span>
+                  <span className="material-icons-round text-2xl text-emerald-500 group-hover:rotate-12 transition-transform">task_alt</span>
+              </button>
+
+              <button
+                 onClick={markNoShow}
+                 disabled={!activeToken || processing || isEmergency}
+                 className="group relative h-20 glass-premium rounded-3xl overflow-hidden disabled:opacity-30 transition-all border border-orange-500/20 hover:border-orange-500/50 flex items-center justify-center gap-3 bg-orange-500/5 hover:bg-orange-500/10"
+              >
+                  <span className="text-sm font-black text-orange-500 uppercase tracking-widest group-hover:scale-105 transition-transform">No Show</span>
+                  <span className="material-icons-round text-2xl text-orange-500 group-hover:scale-110 transition-transform">person_off</span>
               </button>
 
               <button
                 onClick={callNext}
                 disabled={!!activeToken || processing || queueTokens.length === 0 || isEmergency}
-                className="group relative h-24 glass-premium rounded-3xl overflow-hidden disabled:opacity-30 transition-all border border-blue-500/20 hover:border-blue-500/50"
+                className="group relative h-20 glass-premium rounded-3xl overflow-hidden disabled:opacity-30 transition-all border border-blue-500/20 hover:border-blue-500/50 flex items-center justify-center gap-3 bg-blue-500/10 hover:bg-blue-600 hover:text-white"
               >
-                <div className="flex items-center justify-center gap-4">
-                  <span className="text-xl font-black text-blue-500 uppercase tracking-widest group-hover:scale-105 transition-transform">Summon Next Patient</span>
-                  <span className="material-icons-round text-3xl text-blue-500 group-hover:translate-x-3 transition-transform">bolt</span>
-                </div>
+                  <span className="text-sm font-black text-blue-500 group-hover:text-white uppercase tracking-widest group-hover:scale-105 transition-transform">Call Next</span>
+                  <span className="material-icons-round text-2xl text-blue-500 group-hover:text-white group-hover:translate-x-2 transition-transform">bolt</span>
               </button>
             </div>
 
@@ -379,13 +420,24 @@ const StaffDashboard: React.FC = () => {
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => callTokenManual(token.id)}
-                        disabled={processing || isEmergency}
-                        className="opacity-0 group-hover:opacity-100 p-3 rounded-2xl bg-blue-600 text-white hover:bg-white hover:text-blue-600 transition-all shadow-3xl active:scale-90"
-                      >
-                        <span className="material-icons-round text-xl">play_arrow</span>
-                      </button>
+                      <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                          <button
+                            onClick={() => priorityOverride(token.id)}
+                            disabled={processing || isEmergency || token.severity === 'emergency'}
+                            className="p-3 rounded-2xl border border-red-500/30 text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                            title="Priority Override"
+                          >
+                            <span className="material-icons-round text-lg">priority_high</span>
+                          </button>
+                          <button
+                            onClick={() => callTokenManual(token.id)}
+                            disabled={processing || isEmergency}
+                            className="p-3 rounded-2xl bg-blue-600 text-white hover:bg-white hover:text-blue-600 transition-all shadow-3xl active:scale-90"
+                            title="Call Now"
+                          >
+                            <span className="material-icons-round text-lg">play_arrow</span>
+                          </button>
+                      </div>
                     </div>
                   ))
                 )}
@@ -410,21 +462,65 @@ const StaffDashboard: React.FC = () => {
 
               <div className="h-px bg-white/10 mx-4" />
 
-              <button
-                onClick={toggleEmergency}
-                className={`w-full py-6 rounded-2xl border font-black text-[10px] tracking-[0.4em] uppercase transition-all flex items-center justify-center gap-4 ${isEmergency
-                  ? 'bg-red-600 text-white border-red-500 shadow-[0_0_30px_rgba(220,38,38,0.5)] animate-pulse'
-                  : 'bg-red-600/10 text-red-500 border-red-500/20 hover:bg-red-600 hover:text-white'
-                  }`}
-              >
-                <span className="material-icons-round text-xl">{isEmergency ? 'cancel' : 'notification_important'}</span>
-                {isEmergency ? 'Inhibit Emergency' : 'Broadcast Emergency'}
-              </button>
+              <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setShowHandover(true)}
+                    className="w-full py-5 rounded-2xl border border-blue-500/30 font-black text-[9px] tracking-[0.3em] uppercase transition-all bg-white/5 text-blue-400 hover:bg-blue-600 hover:text-white flex items-center justify-center gap-3"
+                  >
+                    <span className="material-icons-round text-lg">assignment_turned_in</span>
+                    End Shift
+                  </button>
+
+                  <button
+                    onClick={toggleEmergency}
+                    className={`w-full py-5 rounded-2xl border font-black text-[9px] tracking-[0.3em] uppercase transition-all flex items-center justify-center gap-3 ${isEmergency
+                      ? 'bg-red-600 text-white border-red-500 shadow-[0_0_30px_rgba(220,38,38,0.5)] animate-pulse'
+                      : 'bg-red-600/10 text-red-500 border-red-500/20 hover:bg-red-600 hover:text-white'
+                      }`}
+                  >
+                    <span className="material-icons-round text-lg">{isEmergency ? 'cancel' : 'notification_important'}</span>
+                    {isEmergency ? 'Global Code Blue' : 'Code Blue'}
+                  </button>
+              </div>
             </div>
 
           </div>
         </div>
       </div>
+
+      {showHandover && (
+          <div className="fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in zoom-in-95 duration-300">
+              <div className="bg-[#020617] max-w-lg w-full rounded-[3rem] border border-blue-500/30 p-12 shadow-3xl">
+                  <div className="text-center mb-10">
+                      <span className="material-icons-round text-5xl text-blue-500 mb-4">fact_check</span>
+                      <h3 className="text-3xl font-black text-white uppercase tracking-tighter">Shift Summary</h3>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mt-2">End of watch metrics</p>
+                  </div>
+                  
+                  <div className="space-y-6 mb-12">
+                      <div className="flex justify-between items-center p-5 rounded-2xl bg-white/5 border border-white/5">
+                          <span className="text-xs font-black uppercase text-slate-400 tracking-widest">Tokens Processed</span>
+                          <span className="text-2xl font-black text-emerald-500">{tokens.filter(t => t.status === 'completed').length}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-5 rounded-2xl bg-white/5 border border-white/5">
+                          <span className="text-xs font-black uppercase text-slate-400 tracking-widest">No-Shows</span>
+                          <span className="text-2xl font-black text-orange-500">{tokens.filter(t => t.status === 'no_show').length}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-5 rounded-2xl bg-white/5 border border-white/5">
+                          <span className="text-xs font-black uppercase text-slate-400 tracking-widest">Active Waiting</span>
+                          <span className="text-2xl font-black text-blue-500">{tokens.filter(t => t.status === 'waiting').length}</span>
+                      </div>
+                  </div>
+
+                  <button 
+                      onClick={() => setShowHandover(false)}
+                      className="w-full py-6 bg-blue-600 hover:bg-white hover:text-blue-600 text-white rounded-full font-black uppercase tracking-[0.4em] text-[10px] transition-all"
+                  >
+                      Acknowledge & Sign Off
+                  </button>
+              </div>
+          </div>
+      )}
     </div>
   );
 };
