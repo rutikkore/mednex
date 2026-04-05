@@ -83,13 +83,11 @@ const TokenTracking: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-              <h1 className="text-impact text-7xl sm:text-8xl md:text-9xl xl:text-[10rem] tracking-tighter leading-none whitespace-nowrap relative group select-none">
+              <h1 className="text-impact text-4xl sm:text-7xl md:text-9xl xl:text-[10rem] tracking-tighter leading-none relative group select-none">
                 <span className="relative z-10 mix-blend-overlay">GRID</span>
                 <span className="text-blue-500 relative z-10">TRACK</span>
-                <span className="absolute left-0 top-0 text-red-500 opacity-0 group-hover:opacity-50 transition-opacity duration-100 animate-pulse transform translate-x-[2px] pointer-events-none">GRIDTRACK</span>
-                <span className="absolute left-0 top-0 text-cyan-500 opacity-0 group-hover:opacity-50 transition-opacity duration-100 animate-pulse delay-75 transform -translate-x-[2px] pointer-events-none">GRIDTRACK</span>
               </h1>
-              <h2 className="text-impact text-xl sm:text-2xl md:text-3xl text-slate-400 tracking-tight leading-tight uppercase">
+              <h2 className="text-impact text-lg sm:text-2xl md:text-3xl text-slate-400 tracking-tight leading-tight uppercase">
                 Metropolitan Identity <span className="text-white">Triage Status</span>
               </h2>
             </div>
@@ -156,7 +154,7 @@ const TokenTracking: React.FC = () => {
                   <div className="flex flex-col md:flex-row justify-between items-start gap-10">
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-500 animate-[pulse-glow_3s_infinite]">Live Grid Identity</span>
-                      <h3 className="text-impact text-[10rem] sm:text-[12rem] text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 mt-4 leading-none group-hover:text-blue-500 transition-colors duration-500 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                      <h3 className="text-impact text-[6rem] sm:text-[10rem] md:text-[12rem] text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 mt-4 leading-none group-hover:text-blue-500 transition-colors duration-500 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                         {result.number}
                       </h3>
                       <div className="flex flex-wrap items-center gap-4 mt-8">
@@ -174,7 +172,7 @@ const TokenTracking: React.FC = () => {
                         {result.status}
                       </div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Est. Node Velocity</p>
-                      <p className="text-6xl sm:text-7xl font-black text-white mt-2 tracking-tighter drop-shadow-2xl">~{result.eta}</p>
+                      <p className="text-5xl sm:text-7xl font-black text-white mt-2 tracking-tighter drop-shadow-2xl">~{result.eta}</p>
                     </div>
                   </div>
 

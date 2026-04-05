@@ -12,12 +12,13 @@ To reduce emergency response times and optimize hospital resource allocation by 
 - **Maps & Routing**: Leaflet (via `react-leaflet`)
 - **State Management**: React Context API (`useAuth`, `useHospital`)
 - **Routing**: React Router (`react-router-dom`)
-- **UI/UX & Design**: Premium, modern glassmorphic interface with Vercel-like aesthetics, smooth stagger animations, hover effects, and full dark-mode support for accessible data visualization.
+- **UI/UX & Design**: Premium, modern glassmorphic interface with Vercel-like aesthetics, 3D animations, particle effects, parallax scrolling, smooth stagger animations, hover effects, and full dark-mode support for accessible data visualization.
 
 ## 🔑 Key Roles & Features
 
 ### 1. Patient Interface
 Designed for quick access to critical information.
+- **AI Triage System**: Intelligent symptom checker with robust logic to accurately categorize required medical departments, prioritizing symptom assessment before token booking.
 - **Emergency Redirect**: Automatic location-based search for the nearest hospital with available **ICU**, **Cardiac**, or **General** beds.
 - **Token System**: Book OPD appointments and track queue status in real-time to avoid waiting in crowds.
 - **Blood Bank View**: Check real-time stock levels of different blood groups across connected blood banks.
@@ -59,6 +60,8 @@ Tracks blood inventory.
 - `id`: UUID
 - `name`, `city`, `lat`, `lng`: Location info
 - `stock`: JSONB object storing counts for each blood group (e.g., `{"A+": 10, "O-": 2}`)
+- `inventory_details`: JSONB array storing detailed batch tracking and expiry info.
+- `last_updated_at`: Automatically updated via PostgreSQL triggers for the freshness engine.
 
 ### `tokens`
 Manages the OPD queue system.
@@ -70,8 +73,10 @@ Manages the OPD queue system.
 ### `profiles`
 Extends Supabase Auth with custom user data.
 - `id`: References `auth.users`
+- `email`: User's primary email address
 - `role`: `patient` | `receptionist` | `admin` | `doctor`
 - `full_name`, `avatar_url`: Display info
+- `updated_at`: Timestamp of the last profile modification
 
 ### `notifications`
 Powers the Global Notification System.
@@ -84,10 +89,11 @@ Powers the Global Notification System.
 ### `blood_transfer_requests`
 Facilitates hospital-to-hospital inter-bank transfers.
 - `id`: UUID
-- `from_hospital_id` / `to_hospital_id`: References `hospitals.id`
-- `blood_group`: The required stock group
-- `quantity`: Amount requested
-- `status`: `pending` | `approved` | `completed` | `rejected`
+- `requester_bank_id` / `supplier_bank_id`: References `blood_banks.id`
+- `blood_type`: The required stock group
+- `units`: Amount requested
+- `status`: `pending` | `approved` | `in_transit` | `delivered` | `rejected`
+- `updated_at`: Real-time tracking of lifecycle state changes.
 
 ## 🔄 Emergency Logic (The "Brain")
 The **EmergencyRedirect** module (`frontend/pages/EmergencyRedirect.tsx`) is the system's most crucial feature. It:
@@ -96,3 +102,24 @@ The **EmergencyRedirect** module (`frontend/pages/EmergencyRedirect.tsx`) is the
 3.  **Filters** hospitals that have valid availability for the specific required bed type (ICU/Cardiac/General).
 4.  **Ranks** them by proximity using a distance algorithm.
 5.  **Directs** the user to the best facility with turn-by-turn navigation link.
+
+## 🧩 Frontend Architecture (Hooks & Lifecycle)
+
+The frontend uses custom React hooks to manage real-time state and system integrity:
+
+- **`useSync`**: Ensures global data synchronization across all open sessions.
+- **`useNotifications`**: Subscribes to the Supabase `notifications` table for real-time resource alerts.
+- **`useDataFreshness`**: Monitors `last_updated_at` fields to display the `FreshnessBadge` and alert users of stale data.
+- **`useAuth`**: Manages RBAC and session persistence via Supabase Auth.
+
+## ⚙️ Setup & Onboarding Flow
+
+To ensure a smooth developer experience, the project includes an automated onboarding flow:
+1. **Environment Check**: On launch, the app checks for `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+2. **Setup Redirect**: If missing, the user is redirected to `SetupScreen.tsx`.
+3. **Database Initialization**: Guided instructions for running `backend/schema.sql` and `backend/seed.sql` to prepare the environment.
+
+## ⚡ Backend Logic & Automation
+
+- **Automated Timestamps**: PostgreSQL triggers (`update_last_updated_at_column`) automatically update the `last_updated_at` column whenever a hospital's resource count or blood bank's stock is modified.
+- **Real-time Publications**: The `blood_transfer_requests` table is explicitly added to the `supabase_realtime` publication to enable instant UI state transitions.

@@ -20,7 +20,8 @@ The project is strictly organized into separate environments to keep the codebas
 - **Maps & Routing**: Leaflet (via `react-leaflet`)
 - **State Management**: React Context API (`useAuth`, `useHospital`)
 - **Routing**: React Router (`react-router-dom`)
-- **UI/UX & Design**: Premium, modern glassmorphic interface with Vercel-like aesthetics, smooth stagger animations, hover effects, and full dark-mode support for accessible data visualization.
+- **UI/UX & Design**: Premium, modern glassmorphic interface with Vercel-like aesthetics, 3D animations, particle effects, parallax scrolling, smooth stagger animations, hover effects, and full dark-mode support.
+- **Onboarding**: Integrated `SetupScreen` for guided Supabase configuration and environment validation.
 
 ## 🚦 Getting Started
 
@@ -43,12 +44,16 @@ npm run dev
 
 Visit `http://localhost:5173` in your browser to view the application!
 
+> [!NOTE]
+> If environment variables are missing, the app will automatically redirect to the **Setup Screen** to guide you through the Supabase connection process.
+
 ---
 
 ## 🔑 Key Roles & Features
 
 ### 1. Patient Interface
 Designed for quick access to critical information.
+- **AI Triage System**: Intelligent symptom checker that accurately categorizes required medical departments, guiding patients effectively prior to appointment scheduling.
 - **Emergency Redirect**: Automatic location-based search for the nearest hospital with available **ICU**, **Cardiac**, or **General** beds.
 - **Token System**: Book OPD appointments and track queue status in real-time to avoid waiting in crowds.
 - **Blood Bank View**: Check real-time stock levels of different blood groups across connected blood banks.
@@ -69,9 +74,11 @@ Strategic control center for hospital administrators and metropolitan grid contr
 - **Grid Audit Generation**: Instantly export live system snapshots, logs, and telemetry matrix data as JSON.
 
 ### 4. Core System Infrastructure
-- **Data Reliability & Freshness Tracking**: Automated staleness metrics (`step1_staleness.sql`, `FreshnessBadge`) ensure real-time data integrity and prevent UI decay.
-- **Inter-Hospital Transfers**: A specialized module for requesting and fulfilling blood transfers between hospital nodes (`step5_blood_transfers.sql`).
-- **Role-Based Access Control (RBAC)**: Supabase-driven security separating patients, staff, and admins.
+- **Data Reliability & Freshness Tracking**: Automated staleness metrics (`step1_staleness.sql`, `FreshnessBadge`, and the `useDataFreshness` hook) ensure real-time data integrity and prevent UI decay. PostgreSQL triggers automatically maintain `last_updated_at` records.
+- **Inter-Hospital Transfers**: A specialized module for requesting and fulfilling blood transfers between hospital nodes (`step5_blood_transfers.sql`). Now supports extended states: `pending`, `approved`, `in_transit`, `delivered`, and `rejected`.
+- **Global Notification System**: Real-time alerts for low blood inventory, critical bed capacity, and transfer requests, powered by PostgreSQL triggers.
+- **Role-Based Access Control (RBAC)**: Supabase-driven security separating patients, staff, and admins via `AuthPage`.
+- **Global Notification System**: Powered by PostgreSQL database triggers and the `useNotifications` real-time hook to deliver critical resource alerts instantly.
 
 ---
 

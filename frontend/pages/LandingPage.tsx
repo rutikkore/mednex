@@ -1,9 +1,45 @@
-
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import Tilt from 'react-parallax-tilt';
+import Spline from '@splinetool/react-spline';
+import { ParticlesBackground } from '../src/components/ParticlesBackground';
+import { HeroMockup } from '../src/components/HeroMockup';
+
+const TypewriterText = () => {
+  const texts = ["Flow Intelligence", "Emergency Routing", "Resource Allocation"];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % texts.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <span className="text-white italic inline-block min-w-[300px] text-left">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={index}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.5 }}
+          className="inline-block"
+        >
+          {texts[index]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+};
 
 const LandingPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll();
+  const yParallaxFast = useTransform(scrollYProgress, [0, 1], [0, -300]);
+  const yParallaxSlow = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -31,14 +67,17 @@ const LandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="space-y-24 sm:space-y-40 pb-24 sm:pb-40 bg-[#020617] text-white overflow-hidden">
-      <div className="mesh-gradient"></div>
+    <div ref={containerRef} className="space-y-24 sm:space-y-40 pb-24 sm:pb-40 bg-[#020617] text-white overflow-hidden relative">
+      <ParticlesBackground />
+      <motion.div style={{ y: yParallaxSlow }} className="absolute inset-0 z-0 pointer-events-none">
+        <div className="mesh-gradient"></div>
+      </motion.div>
 
       {/* Hero Section - Optimized for Single-Line Headline and Visual Balance */}
       <section className="relative min-h-[90vh] lg:min-h-screen flex items-center px-4 sm:px-12 xl:px-24 pt-28 lg:pt-0">
         <div className="w-full max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           
-          <div className="space-y-6 sm:space-y-10 reveal z-20 text-center lg:text-left order-2 lg:order-1">
+          <div className="space-y-6 sm:space-y-10 reveal z-20 text-center lg:text-left">
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
               <span className="badge-yellow">Operational Hub Active</span>
               <span className="badge-tag">v4.0 Grid Intelligence</span>
@@ -49,8 +88,8 @@ const LandingPage: React.FC = () => {
               <h1 className="text-impact text-[11vw] sm:text-[10vw] lg:text-[7vw] xl:text-[8.5vw] tracking-tighter leading-none whitespace-nowrap inline-block w-full">
                 MED<span className="text-blue-500">NEXUS</span>
               </h1>
-              <h2 className="text-impact text-lg sm:text-2xl md:text-3xl xl:text-4xl text-slate-400 tracking-tight leading-tight max-w-xl mx-auto lg:mx-0">
-                Precision Hospital <span className="text-white italic">Flow Intelligence</span>
+              <h2 className="text-impact text-lg sm:text-2xl md:text-3xl xl:text-4xl text-slate-400 tracking-tight leading-tight max-w-2xl mx-auto lg:mx-0">
+                Precision Hospital <TypewriterText />
               </h2>
             </div>
             
@@ -72,33 +111,13 @@ const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="relative reveal delay-300 z-10 lg:translate-x-6 px-4 sm:px-0 order-1 lg:order-2">
-            {/* Visual Centerpiece - Adjusted size to prevent clashing with large text */}
-            <div className="relative glass-premium rounded-[2.5rem] sm:rounded-[4rem] p-1.5 sm:p-2 border border-white/20 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] transform lg:rotate-2 group transition-transform duration-700 hover:rotate-0 max-w-2xl mx-auto lg:max-w-none">
-              <div className="overflow-hidden rounded-[2.2rem] sm:rounded-[3.8rem]">
-                <img 
-                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200" 
-                  alt="MedNexus Dashboard Interface" 
-                  className="w-full h-auto opacity-90 scale-105 group-hover:scale-100 transition-transform duration-1000 object-cover aspect-[4/3]"
-                />
-              </div>
-              
-              {/* Floating Performance Tag */}
-              <div className="absolute -top-4 -left-4 sm:-top-8 sm:-left-8 bg-blue-600 text-white px-4 sm:px-8 py-3 sm:py-5 rounded-[1.2rem] sm:rounded-[2rem] shadow-3xl border border-white/20 animate-float hidden xs:block">
-                <p className="text-[7px] sm:text-[9px] font-black uppercase tracking-[0.3em] opacity-70 leading-none">Grid Sync</p>
-                <p className="text-xl sm:text-4xl font-black mt-1 leading-none">99.9%</p>
-              </div>
-
-              {/* Status Badge */}
-              <div className="absolute -bottom-6 right-4 sm:-bottom-8 sm:right-8 bg-[#020617] backdrop-blur-3xl border border-white/10 px-4 sm:px-8 py-3 sm:py-5 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl flex items-center gap-3 sm:gap-6">
-                <div className="w-8 h-8 sm:w-14 sm:h-14 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 shrink-0">
-                  <span className="material-icons-round text-lg sm:text-3xl animate-pulse">sensors</span>
-                </div>
-                <div>
-                  <p className="text-[7px] sm:text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">Eff. Load</p>
-                  <p className="text-lg sm:text-3xl font-black text-white mt-1 leading-none">+32%</p>
-                </div>
-              </div>
+          <div className="relative reveal delay-300 z-10 lg:translate-x-6 px-4 sm:px-0">
+            {/* Visual Centerpiece - Interactive Dashboard Mockup */}
+            <motion.div style={{ y: yParallaxFast }} className="relative reveal delay-300 z-10 hidden lg:block">
+              <HeroMockup />
+            </motion.div>
+            <div className="relative reveal delay-300 z-10 lg:hidden block">
+              <HeroMockup />
             </div>
             {/* Ambient Background Glows */}
             <div className="absolute -z-10 -top-10 -right-10 w-[20rem] sm:w-[40rem] h-[20rem] sm:h-[40rem] bg-blue-600/10 blur-[80px] sm:blur-[120px] rounded-full"></div>
@@ -114,15 +133,17 @@ const LandingPage: React.FC = () => {
             { icon: 'analytics', title: 'Live Status', desc: 'Real-time telemetry for bed occupancy and surgical suite availability across nodes.', color: 'text-indigo-500' },
             { icon: 'emergency', title: 'Emergency Redir', desc: 'Instant critical path routing to nearest facilities with zero-latency handoff protocols.', color: 'text-red-500' }
           ].map((f, i) => (
-            <div key={i} className="spotlight-card glass-premium rounded-[2rem] sm:rounded-[3rem] p-8 sm:p-12 space-y-6 sm:space-y-10 reveal" style={{ transitionDelay: `${i * 100}ms` }}>
-              <div className={`w-14 h-14 sm:w-16 sm:h-16 bg-slate-900 rounded-2xl sm:rounded-3xl flex items-center justify-center ${f.color} shadow-2xl border border-white/5`}>
-                <span className="material-icons-round text-3xl sm:text-4xl">{f.icon}</span>
+            <Tilt key={i} className="h-full z-10" tiltMaxAngleX={8} tiltMaxAngleY={8} glareEnable={true} glareMaxOpacity={0.15} glareColor="#ffffff" glarePosition="all" glareBorderRadius="3rem">
+              <div className="h-full spotlight-card glass-premium rounded-[2rem] sm:rounded-[3rem] p-8 sm:p-12 space-y-6 sm:space-y-10 reveal border border-white/10 bg-slate-900/50 backdrop-blur-xl" style={{ transitionDelay: `${i * 100}ms` }}>
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 bg-slate-900 rounded-2xl sm:rounded-3xl flex items-center justify-center ${f.color} shadow-2xl border border-white/5`}>
+                  <span className="material-icons-round text-3xl sm:text-4xl">{f.icon}</span>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase leading-none">{f.title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed font-medium">{f.desc}</p>
+                </div>
               </div>
-              <div className="space-y-4">
-                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase leading-none">{f.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed font-medium">{f.desc}</p>
-              </div>
-            </div>
+            </Tilt>
           ))}
         </div>
       </section>
@@ -152,11 +173,9 @@ const LandingPage: React.FC = () => {
       <section className="px-4 sm:px-12 xl:px-24 w-full max-w-[1800px] mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
         <div className="flex-1 w-full reveal order-2 lg:order-1">
           <div className="relative glass-premium rounded-[2.5rem] sm:rounded-[4rem] p-6 sm:p-10 border border-white/10 overflow-hidden shadow-3xl">
-            <img 
-              src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&q=80&w=1200" 
-              alt="World Health Network Visualization" 
-              className="w-full h-[300px] sm:h-[500px] object-cover rounded-[2rem] sm:rounded-[3rem] opacity-30 grayscale contrast-125 brightness-125"
-            />
+            <div className="w-full h-[300px] sm:h-[500px] relative rounded-[2rem] sm:rounded-[3rem] overflow-hidden bg-black/50">
+              <Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" />
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent"></div>
             <div className="absolute bottom-6 left-6 sm:bottom-12 sm:left-12 flex items-center gap-4 sm:gap-6 bg-slate-900/90 backdrop-blur-3xl px-6 sm:px-10 py-3 sm:py-5 rounded-[1.5rem] sm:rounded-[2.2rem] border border-white/10 shadow-3xl">
               <span className="w-2 sm:w-3 h-2 sm:h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_15px_#10b981]"></span>

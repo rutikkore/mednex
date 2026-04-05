@@ -11,6 +11,7 @@ import BloodBank from './pages/BloodBank';
 import StaffDashboard from './pages/StaffDashboard';
 import CounterConsole from './pages/CounterConsole';
 import BedManagement from './pages/BedManagement';
+import AITriage from './pages/AITriage';
 import AdminDashboard from './pages/AdminDashboard';
 import GlobalLayout from './layouts/GlobalLayout';
 import { AuthProvider, useAuth } from './hooks/useAuth';
@@ -46,6 +47,7 @@ const App: React.FC = () => {
             <Route path="/patient">
               <Route index element={<ProtectedRoute allowedRoles={['patient']}><PatientDashboard /></ProtectedRoute>} />
               <Route path="book" element={<ProtectedRoute allowedRoles={['patient']}><TokenBooking /></ProtectedRoute>} />
+              <Route path="triage" element={<ProtectedRoute allowedRoles={['patient']}><AITriage /></ProtectedRoute>} />
               <Route path="emergency" element={<ProtectedRoute allowedRoles={['patient']}><EmergencyRedirect /></ProtectedRoute>} />
               <Route path="blood-bank" element={<ProtectedRoute allowedRoles={['patient']}><BloodBank /></ProtectedRoute>} />
             </Route>

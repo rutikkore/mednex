@@ -63,11 +63,11 @@ const GlobalLayout: React.FC = () => {
 
   const navItems: Record<string, NavItem[]> = {
     patient: [
+      { label: 'AI Triage', path: '/patient/triage', icon: 'smart_toy', badge: true },
       { label: 'Book', path: '/patient/book', icon: 'add_circle' },
       { label: 'Track', path: '/track', icon: 'radar', badge: true },
       { label: 'Dash', path: '/patient', icon: 'dashboard' },
       { label: 'Emergency', path: '/patient/emergency', icon: 'emergency' },
-      { label: 'Blood Bank', path: '/patient/blood-bank', icon: 'bloodtype' },
     ],
     receptionist: [
       { label: 'Queue', path: '/staff', icon: 'dashboard' },

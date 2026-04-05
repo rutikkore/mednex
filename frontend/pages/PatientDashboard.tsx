@@ -89,9 +89,9 @@ const PatientDashboard: React.FC = () => {
             <span className="badge-tag border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]">Connected</span>
           </div>
 
-          <h1 className="text-impact text-6xl sm:text-7xl md:text-8xl xl:text-9xl tracking-tighter leading-none relative group select-none">
+          <h1 className="text-impact text-4xl sm:text-7xl md:text-8xl xl:text-9xl tracking-tighter leading-none relative group select-none">
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">YOUR</span>
-            <span className="text-blue-500">DASHBOARD</span>
+            <span className="text-blue-500 block">DASHBOARD</span>
           </h1>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium">
             Manage your appointments and track your token status in real-time.
@@ -230,14 +230,17 @@ const PatientDashboard: React.FC = () => {
           </div>
 
           {/* Stat 3 */}
-          <div className="glass-premium rounded-[2.5rem] p-8 border border-white/10 hover:border-purple-500/30 transition-all duration-500">
+          <div onClick={() => navigate('/patient/triage')} className="cursor-pointer glass-premium rounded-[2.5rem] p-8 border border-white/10 hover:border-purple-500/30 transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute top-8 right-8 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="material-icons-round text-purple-500">arrow_outward</span>
+            </div>
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500">
-                <span className="material-icons-round">notifications</span>
+                <span className="material-icons-round">smart_toy</span>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Notifications</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">AI Triage</p>
             </div>
-            <p className="text-4xl font-black text-white">3</p>
+            <p className="text-4xl font-black text-white">Ready</p>
           </div>
         </div>
 

@@ -21,7 +21,7 @@ const AuthPage: React.FC = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      if (user.role === 'patient') navigate('/patient');
+      if (user.role === 'patient') navigate('/patient/book');
       else if (user.role === 'admin') navigate('/admin');
       else navigate('/staff');
     }

@@ -20,14 +20,26 @@ export function useHospital() {
             setHospitalId(stored);
         }
         setLoading(false);
+
+        const handleHospitalChanged = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            if (customEvent.detail?.userId === user.id) {
+                setHospitalId(customEvent.detail.hospitalId);
+            }
+        };
+        
+        window.addEventListener('hospital_changed', handleHospitalChanged);
+        return () => window.removeEventListener('hospital_changed', handleHospitalChanged);
     }, [user]);
 
     const setAssignedHospital = (id: string | null) => {
         setHospitalId(id);
         if (user && id) {
             localStorage.setItem(`mednexus_staff_hospital_${user.id}`, id);
+            window.dispatchEvent(new CustomEvent('hospital_changed', { detail: { userId: user.id, hospitalId: id } }));
         } else if (user && !id) {
             localStorage.removeItem(`mednexus_staff_hospital_${user.id}`);
+            window.dispatchEvent(new CustomEvent('hospital_changed', { detail: { userId: user.id, hospitalId: null } }));
         }
     };
 

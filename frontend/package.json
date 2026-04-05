@@ -14,11 +14,16 @@
   },
   "dependencies": {
     "@google/genai": "^1.41.0",
+    "@splinetool/react-spline": "^4.1.0",
     "@supabase/supabase-js": "^2.95.3",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
+    "framer-motion": "^12.38.0",
     "leaflet": "^1.9.4",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-leaflet": "^5.0.0",
+    "react-parallax-tilt": "^1.7.322",
     "react-router-dom": "^7.13.0",
     "recharts": "^3.7.0"
   },

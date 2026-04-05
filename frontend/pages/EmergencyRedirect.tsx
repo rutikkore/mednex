@@ -158,8 +158,8 @@ const EmergencyRedirect: React.FC = () => {
             <span className="badge-tag">Real-time Metropolitan Scan</span>
           </div>
 
-          <h1 className="text-impact text-7xl sm:text-9xl tracking-tighter leading-none">
-            CRITICAL<br /><span className="text-red-500">REDIRECT</span>
+          <h1 className="text-impact text-4xl sm:text-7xl md:text-9xl tracking-tighter leading-none">
+            CRITICAL <span className="text-red-500">REDIRECT</span>
           </h1>
         </div>
 
